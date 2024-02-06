@@ -1,0 +1,103 @@
+/* AnimeCarousel */
+
+.animeCarousel {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.animeTrack {
+  display: flex;
+}
+
+.animeBtnContainer {
+}
+
+.animeBtn {
+  width: 7.4rem;
+  height: 7.4rem;
+  background-color: var(--page-bg-color);
+  opacity: 0.6;
+  border-radius: 50%;
+  border: none;
+  position: absolute;
+  top: 50%;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.animeBtn > * {
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.animeBtn > *:hover {
+  opacity: 1;
+}
+
+.animeBtn:hover {
+  opacity: 0.8;
+}
+
+.animeBtnPrev {
+  left: 0;
+  transform: translate(-75%, -50%);
+}
+
+.animeBtnPrev > * {
+  padding-inline-start: 50%;
+}
+
+.animeBtnNext {
+  right: 0;
+  transform: translate(75%, -50%);
+}
+
+.animeBtnNext > * {
+  padding-inline-end: 50%;
+}
+
+.animeCarousel:hover .animeBtnPrev {
+  transform: translate(-50%, -50%);
+}
+
+.animeCarousel:hover .animeBtnNext {
+  transform: translate(50%, -50%);
+}
+
+/* AnimeSlide */
+
+.AnimeSlide {
+  list-style: none;
+  flex: 0 0 100%;
+  aspect-ratio: 17/24;
+}
+
+@media (min-width: 31em) {
+  .AnimeSlide {
+    flex: 0 0 50%;
+  }
+}
+
+@media (min-width: 43.5em) {
+  .AnimeSlide {
+    flex: 0 0 calc(100% / 3);
+  }
+}
+
+@media (min-width: 56em) {
+  .AnimeSlide {
+    flex: 0 0 25%;
+  }
+}
+
+@media (min-width: 68.5em) {
+  .AnimeSlide {
+    flex: 0 0 20%;
+  }
+}
+
+.AnimeSlideImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

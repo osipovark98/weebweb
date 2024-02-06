@@ -1,0 +1,18 @@
+.section {
+  padding-block: 4.8rem;
+}
+
+.sectionHeading {
+  font-size: 3.6rem;
+  /* font-weight: 400; */
+  color: var(--text-color);
+  margin-bottom: 2.4rem;
+}
+
+.sectionHeading:after {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--text-color);
+}

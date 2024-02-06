@@ -1,0 +1,21 @@
+.animeItem {
+  overflow: hidden;
+  list-style: none;
+  border-radius: 2.4rem;
+  box-shadow: 0.4rem 0.4rem 0.6rem rgba(0, 0, 0, 0.2);
+}
+
+.animeItem:hover {
+}
+
+.animeItemLink {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.animeItemImg {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
