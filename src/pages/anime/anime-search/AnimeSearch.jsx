@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer, useRef } from "react";
 
 import * as Icons from "@heroicons/react/16/solid";
 
@@ -11,42 +11,72 @@ import styles from "./AnimeSearch.module.css";
 
 function reducer(state, action) {
   switch (action.type) {
-    case "queryChanged":
+    case "changeQuery":
       return {
         ...state,
         queryParams: {
           ...state.queryParams,
+          page: null,
           q: action.payload,
         },
       };
-    case "sfwToggle":
+    case "toggleSFW":
       return {
         ...state,
         queryParams: {
           ...state.queryParams,
+          page: null,
           sfw: !state.queryParams.sfw,
         },
       };
-    case "typeChange":
+    case "toggleApproved":
       return {
         ...state,
         queryParams: {
           ...state.queryParams,
+          page: null,
+          approved: !state.queryParams.approved,
+        },
+      };
+    case "changeType":
+      return {
+        ...state,
+        queryParams: {
+          ...state.queryParams,
+          page: null,
           type: action.payload,
         },
       };
-    case "setAnimes":
+    case "changeRating":
       return {
         ...state,
-        animes: [...action.payload],
+        queryParams: {
+          ...state.queryParams,
+          page: null,
+          rating: action.payload,
+        },
       };
-    case "setPage":
+    case "changeStatus":
+      return {
+        ...state,
+        queryParams: {
+          ...state.queryParams,
+          page: null,
+          status: action.payload,
+        },
+      };
+    case "changePage":
       return {
         ...state,
         queryParams: {
           ...state.queryParams,
           page: action.payload,
         },
+      };
+    case "setAnimes":
+      return {
+        ...state,
+        animes: [...action.payload],
       };
   }
 }
@@ -55,14 +85,19 @@ function AnimeSearch() {
   const [state, dispatch] = useReducer(reducer, {
     queryParams: {
       q: "",
-      page: null,
-      sfw: true,
       type: "",
+      rating: "",
+      status: "",
+      sfw: true,
+      approved: false,
+      page: null,
     },
     animes: [],
     maxPage: null,
   });
   const [isAdvancedDisplayed, setIsAdvancedDisplayed] = useState(false);
+  const maxPage = useRef(null);
+  const queryInputValue = useRef(null);
 
   useEffect(() => {
     const fetchAnimes = async function (fetchQuery, signal) {
@@ -75,8 +110,10 @@ function AnimeSearch() {
       }
       if (response.status === 200) {
         const json = await response.json();
+        maxPage.current = json.pagination.last_visible_page;
+        console.log(maxPage.current);
         dispatch({ type: "setAnimes", payload: json.data });
-        dispatch({ type: "setPage", payload: json.pagination.current_page });
+        dispatch({ type: "changePage", payload: json.pagination.current_page });
       }
     };
 
@@ -110,22 +147,25 @@ function AnimeSearch() {
     state.queryParams.type,
   ]);
 
-  // const handlePrevPageClick = function () {};
+  const handlePrevPageClick = function () {
+    if (state.queryParams.page === 1) return;
+    dispatch({ type: "changePage", payload: state.queryParams.page - 1 });
+  };
 
-  // const handleNextPageClick = function () {};
+  const handleNextPageClick = function () {
+    if (state.queryParams.page === maxPage.current) return;
+    dispatch({ type: "changePage", payload: state.queryParams.page + 1 });
+  };
 
   return (
-    <>
-      <search className={`${styles.animeSearch} container--1200`}>
+    <main className="container--1200">
+      <search className={styles.animeSearch}>
         <div className={styles.searchBar}>
           <input
             type="search"
             className={styles.queryInput}
             placeholder="Search anime..."
-            value={state.queryParams.q}
-            onChange={(e) => {
-              dispatch({ type: "queryChanged", payload: e.target.value });
-            }}
+            ref={queryInputValue}
           />
           <button
             type="button"
@@ -134,9 +174,18 @@ function AnimeSearch() {
           >
             <Icons.AdjustmentsHorizontalIcon />
           </button>
-          {/* <button type="button" className={styles.searchBtn} onClick={() => {}}>
+          <button
+            type="button"
+            className={styles.searchBtn}
+            onClick={() =>
+              dispatch({
+                type: "changeQuery",
+                payload: queryInputValue.current.value,
+              })
+            }
+          >
             <Icons.MagnifyingGlassIcon />
-          </button> */}
+          </button>
         </div>
         <form
           className={`${styles.advancedSearchForm} ${
@@ -152,7 +201,7 @@ function AnimeSearch() {
               type="checkbox"
               id="nsfw-flag"
               checked={!state.queryParams.sfw}
-              onChange={() => dispatch({ type: "sfwToggle" })}
+              onChange={() => dispatch({ type: "toggleSFW" })}
             />
           </div>
           <div className={styles.searchField}>
@@ -163,6 +212,8 @@ function AnimeSearch() {
               className={styles.checkbox}
               type="checkbox"
               id="approved-flag"
+              checked={state.queryParams.approved}
+              onChange={() => dispatch({ type: "toggleApproved" })}
             />
           </div>
           <div className={styles.searchField}>
@@ -172,7 +223,7 @@ function AnimeSearch() {
               name="type"
               value={state.queryParams.type}
               onChange={(e) =>
-                dispatch({ type: "typeChange", payload: e.target.value })
+                dispatch({ type: "changeType", payload: e.target.value })
               }
             >
               <option value="">--Choose Type--</option>
@@ -189,7 +240,14 @@ function AnimeSearch() {
           </div>
           <div className={styles.searchField}>
             <label className={styles.searchLabel}>rating</label>
-            <select className={styles.select} name="rating">
+            <select
+              className={styles.select}
+              name="rating"
+              value={state.queryParams.rating}
+              onChange={(e) =>
+                dispatch({ type: "changeRating", payload: e.target.value })
+              }
+            >
               <option value="">--Choose Rating--</option>
               <option value="g">G - All Ages</option>
               <option value="pg">PG - Children</option>
@@ -201,7 +259,14 @@ function AnimeSearch() {
           </div>
           <div className={styles.searchField}>
             <label className={styles.searchLabel}>status</label>
-            <select className={styles.select} name="status">
+            <select
+              className={styles.select}
+              name="status"
+              value={state.queryParams.status}
+              onChange={(e) =>
+                dispatch({ type: "changeStatus", payload: e.target.value })
+              }
+            >
               <option value="">--Choose Status--</option>
               <option value="airing">Airing</option>
               <option value="upcoming">Upcoming</option>
@@ -210,25 +275,31 @@ function AnimeSearch() {
           </div>
         </form>
       </search>
-      <section className={`${styles.searchResults} container--1200`}>
+      <section className={styles.searchResults}>
         <ul className={styles.animeItemsList}>
           {state.animes.map((anime) => (
-            <AnimeItem key={anime.mal_id} animeInfo={anime} />
+            <AnimeItem key={anime.mal_id} anime={anime} />
           ))}
         </ul>
         {state.queryParams.page && (
           <div className={styles.pageBtnBox}>
-            <button className={styles.btnPrevPage}>
+            <button
+              className={styles.btnChangePage}
+              onClick={handlePrevPageClick}
+            >
               <Icons.ChevronLeftIcon />
             </button>
             <p className={styles.currentPageNum}>{state.queryParams.page}</p>
-            <button className={styles.btnNextPage}>
+            <button
+              className={styles.btnChangePage}
+              onClick={handleNextPageClick}
+            >
               <Icons.ChevronRightIcon />
             </button>
           </div>
         )}
       </section>
-    </>
+    </main>
   );
 }
 

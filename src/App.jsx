@@ -6,6 +6,7 @@ import Profile from "./pages/profile/Profile.jsx";
 import Navigation from "./components/navigation/Navigation.jsx";
 import AnimeIndex from "./pages/anime/anime-index/AnimeIndex.jsx";
 import AnimeSearch from "./pages/anime/anime-search/AnimeSearch.jsx";
+import AnimeInfo from "./pages/anime/anime-info/AnimeInfo.jsx";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route index element={<AnimeIndex />} />
           <Route path="top" element={<p>top anime</p>} />
           <Route path="search" element={<AnimeSearch />} />
+          <Route path=":id" element={<AnimeInfo />} />
         </Route>
         <Route path="/manga" element={<p>manga</p>}></Route>
         <Route path="/profile" element={<Profile />} />
